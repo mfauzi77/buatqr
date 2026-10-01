@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+/* Print Styles for official meeting sheets */
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+  
+  #app-header,
+  #form-card,
+  #app-footer,
+  #toast-container,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  #main-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  #preview-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 2rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  #qr-printable-area {
+    border: 2px solid #cbd5e1 !important;
+    background: #ffffff !important;
+    page-break-inside: avoid !important;
+    padding: 3rem !important;
+    max-width: 500px !important;
+    margin: auto !important;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "QR Code Generator",
+  "description": "Generator QR Code siap pindai untuk Google Meet, Zoom, MS Teams, serta tautan umum dengan logo transparan dan ekspor HD PNG/SVG.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
