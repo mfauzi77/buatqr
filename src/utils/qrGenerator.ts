@@ -375,6 +375,59 @@ export async function generateRawQRCanvas(
           const w = moduleSize - pad * 2;
           const h = moduleSize - pad * 2;
           drawRoundedRect(ctx, x + pad, y + pad, w, h, moduleSize * 0.45);
+        } else if (dotStyle === 'diamond') {
+          // Ketupat / Diamond rhombus shape
+          const pad = moduleSize * 0.05;
+          const cx = x + moduleSize / 2;
+          const cy = y + moduleSize / 2;
+          ctx.beginPath();
+          ctx.moveTo(cx, y + pad);
+          ctx.lineTo(x + moduleSize - pad, cy);
+          ctx.lineTo(cx, y + moduleSize - pad);
+          ctx.lineTo(x + pad, cy);
+          ctx.closePath();
+          ctx.fill();
+        } else if (dotStyle === 'leaf') {
+          // Organic Leaf / Curved diagonal leaf
+          const pad = moduleSize * 0.04;
+          const w = moduleSize - pad * 2;
+          const h = moduleSize - pad * 2;
+          const r = w * 0.45;
+          const px = x + pad;
+          const py = y + pad;
+          ctx.beginPath();
+          ctx.moveTo(px + r, py);
+          ctx.lineTo(px + w, py);
+          ctx.lineTo(px + w, py + h - r);
+          ctx.quadraticCurveTo(px + w, py + h, px + w - r, py + h);
+          ctx.lineTo(px, py + h);
+          ctx.lineTo(px, py + r);
+          ctx.quadraticCurveTo(px, py, px + r, py);
+          ctx.closePath();
+          ctx.fill();
+        } else if (dotStyle === 'star') {
+          // Star / Sparkle cross
+          const pad = moduleSize * 0.05;
+          const cx = x + moduleSize / 2;
+          const cy = y + moduleSize / 2;
+          const rOuter = (moduleSize / 2) - pad;
+          const rInner = rOuter * 0.42;
+          ctx.beginPath();
+          for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI) / 4;
+            const radius = i % 2 === 0 ? rOuter : rInner;
+            const px = cx + Math.cos(angle) * radius;
+            const py = cy + Math.sin(angle) * radius;
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.fill();
+        } else if (dotStyle === 'fluid') {
+          // Fluid / Pebble smooth capsule
+          const pad = moduleSize * 0.05;
+          const rad = (moduleSize - pad * 2) * 0.48;
+          drawRoundedRect(ctx, x + pad, y + pad, moduleSize - pad * 2, moduleSize - pad * 2, rad);
         }
       }
     }
@@ -620,6 +673,42 @@ export async function generateQRSVG(
           } else if (dotStyle === 'classy') {
             const pad = moduleSize * 0.05;
             const rx = (moduleSize * 0.45).toFixed(2);
+            shapes += `<rect x="${(x + pad).toFixed(2)}" y="${(y + pad).toFixed(2)}" width="${(moduleSize - pad * 2).toFixed(2)}" height="${(moduleSize - pad * 2).toFixed(2)}" rx="${rx}" fill="${config.fgColor || '#000000'}" />`;
+          } else if (dotStyle === 'diamond') {
+            const pad = moduleSize * 0.05;
+            const cx = (x + moduleSize / 2).toFixed(2);
+            const cy = (y + moduleSize / 2).toFixed(2);
+            const topY = (y + pad).toFixed(2);
+            const rightX = (x + moduleSize - pad).toFixed(2);
+            const botY = (y + moduleSize - pad).toFixed(2);
+            const leftX = (x + pad).toFixed(2);
+            shapes += `<polygon points="${cx},${topY} ${rightX},${cy} ${cx},${botY} ${leftX},${cy}" fill="${config.fgColor || '#000000'}" />`;
+          } else if (dotStyle === 'leaf') {
+            const pad = moduleSize * 0.04;
+            const w = moduleSize - pad * 2;
+            const h = moduleSize - pad * 2;
+            const r = w * 0.45;
+            const px = x + pad;
+            const py = y + pad;
+            shapes += `<path d="M ${(px + r).toFixed(2)} ${py.toFixed(2)} L ${(px + w).toFixed(2)} ${py.toFixed(2)} L ${(px + w).toFixed(2)} ${(py + h - r).toFixed(2)} Q ${(px + w).toFixed(2)} ${(py + h).toFixed(2)} ${(px + w - r).toFixed(2)} ${(py + h).toFixed(2)} L ${px.toFixed(2)} ${(py + h).toFixed(2)} L ${px.toFixed(2)} ${(py + r).toFixed(2)} Q ${px.toFixed(2)} ${py.toFixed(2)} ${(px + r).toFixed(2)} ${py.toFixed(2)} Z" fill="${config.fgColor || '#000000'}" />`;
+          } else if (dotStyle === 'star') {
+            const pad = moduleSize * 0.05;
+            const cx = x + moduleSize / 2;
+            const cy = y + moduleSize / 2;
+            const rOuter = (moduleSize / 2) - pad;
+            const rInner = rOuter * 0.42;
+            const pts: string[] = [];
+            for (let i = 0; i < 8; i++) {
+              const angle = (i * Math.PI) / 4;
+              const radius = i % 2 === 0 ? rOuter : rInner;
+              const px = (cx + Math.cos(angle) * radius).toFixed(2);
+              const py = (cy + Math.sin(angle) * radius).toFixed(2);
+              pts.push(`${px},${py}`);
+            }
+            shapes += `<polygon points="${pts.join(' ')}" fill="${config.fgColor || '#000000'}" />`;
+          } else if (dotStyle === 'fluid') {
+            const pad = moduleSize * 0.05;
+            const rx = ((moduleSize - pad * 2) * 0.48).toFixed(2);
             shapes += `<rect x="${(x + pad).toFixed(2)}" y="${(y + pad).toFixed(2)}" width="${(moduleSize - pad * 2).toFixed(2)}" height="${(moduleSize - pad * 2).toFixed(2)}" rx="${rx}" fill="${config.fgColor || '#000000'}" />`;
           }
         }

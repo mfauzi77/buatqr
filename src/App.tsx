@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FileText, Sparkles } from 'lucide-react';
 import { Header } from './components/Header';
 import { MeetingForm } from './components/MeetingForm';
 import { QRSettings } from './components/QRSettings';
@@ -16,7 +17,7 @@ const INITIAL_CONFIG: QRConfig = {
   customLogoName: undefined,
   errorCorrectionLevel: 'H',
   qrSize: 1024,
-  margin: 3,
+  margin: 2,
   logoSizePercent: 20,
   logoBorder: true,
   logoBorderColor: '#0F172A',
@@ -52,8 +53,7 @@ export default function App() {
   });
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  // Open style panel by default in studio mode
-  const [isStyleOpen, setIsStyleOpen] = useState(true);
+  const [leftTab, setLeftTab] = useState<'content' | 'style' | 'all'>('content');
 
   // Persist settings locally
   useEffect(() => {
@@ -96,68 +96,141 @@ export default function App() {
       {/* 1. HEADER (Compact) */}
       <Header />
 
-      {/* 2. MAIN DASHBOARD STUDIO (1-Screen Non-Scrolling Responsive Grid) */}
+      {/* 2. MAIN DASHBOARD STUDIO (2-Layer Responsive Grid: Layer 1 Settings & Layer 2 Large Preview) */}
       <main
         id="main-content"
-        className="flex-1 min-h-0 max-w-7xl w-full mx-auto px-3 sm:px-5 py-2 grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch overflow-hidden"
+        className="flex-1 min-h-0 max-w-7xl w-full mx-auto p-2.5 sm:p-3 grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch overflow-hidden"
       >
-        {isStyleOpen ? (
-          <>
-            {/* PANEL 1: DATA RAPAT & LOGO KEMENKO PMK */}
-            <div className="lg:col-span-4 h-full min-h-0 flex flex-col">
-              <MeetingForm
-                config={config}
-                onChange={updateConfig}
-                onToast={addToast}
-                isStyleOpen={isStyleOpen}
-                onToggleStyle={() => setIsStyleOpen(false)}
-              />
+        {/* LAYER 1: PENGATURAN & KONTROL (Link, Judul, Logo, Desain) */}
+        <div className="lg:col-span-6 xl:col-span-5 h-full min-h-0 flex flex-col overflow-hidden">
+          <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-2.5 sm:p-3 h-full flex flex-col overflow-hidden">
+            {/* Layer 1 Header & Tabs */}
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-2 shrink-0 gap-2">
+              <div className="flex items-center gap-1 bg-slate-100 p-0.5 sm:p-1 rounded-lg border border-slate-200 overflow-x-auto">
+                <button
+                  type="button"
+                  id="tab-link-logo"
+                  onClick={() => setLeftTab('content')}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                    leftTab === 'content'
+                      ? 'bg-white text-blue-900 shadow-2xs font-bold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5 text-blue-600" />
+                  <span>1. Link & Judul</span>
+                </button>
+                <button
+                  type="button"
+                  id="tab-style-color"
+                  onClick={() => setLeftTab('style')}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                    leftTab === 'style'
+                      ? 'bg-white text-blue-900 shadow-2xs font-bold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                  <span>2. Gaya & Warna</span>
+                </button>
+                <button
+                  type="button"
+                  id="tab-all-settings"
+                  onClick={() => setLeftTab('all')}
+                  className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                    leftTab === 'all'
+                      ? 'bg-white text-blue-900 shadow-2xs font-bold'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                  title="Tampilkan semua pengaturan"
+                >
+                  <span>Semua</span>
+                </button>
+              </div>
+
+              <span className="hidden sm:inline-flex text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200 shrink-0">
+                Layer 1
+              </span>
             </div>
 
-            {/* PANEL 2: FITUR PENGATURAN GAYA TITIK & WARNA */}
-            <div className="lg:col-span-4 h-full min-h-0 flex flex-col">
-              <QRSettings
-                config={config}
-                onChange={updateConfig}
-                onClose={() => setIsStyleOpen(false)}
-              />
-            </div>
+            {/* Layer 1 Content Area */}
+            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col justify-between">
+              {leftTab === 'content' && (
+                <>
+                  <MeetingForm
+                    config={config}
+                    onChange={updateConfig}
+                    onToast={addToast}
+                    embedded
+                  />
+                  <div className="pt-2 mt-auto shrink-0 border-t border-slate-100">
+                    <button
+                      type="button"
+                      id="btn-goto-style"
+                      onClick={() => setLeftTab('style')}
+                      className="w-full h-8 px-3 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-900 text-xs font-semibold transition-all flex items-center justify-between cursor-pointer"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Pengaturan Gaya Titik & Warna QR</span>
+                      </span>
+                      <span className="text-[11px] font-bold text-blue-700">Lanjut ke Desain →</span>
+                    </button>
+                  </div>
+                </>
+              )}
 
-            {/* PANEL 3: PREVIEW KARTU & DOWNLOAD */}
-            <div className="lg:col-span-4 h-full min-h-0 flex flex-col">
-              <QRPreview
-                config={config}
-                onReset={handleReset}
-                onToast={addToast}
-                onChange={updateConfig}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            {/* 2-COLUMN VIEW WHEN STYLE PANEL IS COLLAPSED */}
-            {/* PANEL 1: DATA RAPAT & LOGO */}
-            <div className="lg:col-span-6 h-full min-h-0 flex flex-col">
-              <MeetingForm
-                config={config}
-                onChange={updateConfig}
-                onToast={addToast}
-                isStyleOpen={isStyleOpen}
-                onToggleStyle={() => setIsStyleOpen(true)}
-              />
-            </div>
+              {leftTab === 'style' && (
+                <>
+                  <QRSettings
+                    config={config}
+                    onChange={updateConfig}
+                    embedded
+                  />
+                  <div className="pt-2 mt-auto shrink-0 border-t border-slate-100">
+                    <button
+                      type="button"
+                      id="btn-backto-content"
+                      onClick={() => setLeftTab('content')}
+                      className="w-full h-8 px-3 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold transition-all flex items-center justify-between cursor-pointer"
+                    >
+                      <span className="text-[11px] font-bold">← Kembali</span>
+                      <span>Edit Link & Judul Rapat</span>
+                    </button>
+                  </div>
+                </>
+              )}
 
-            {/* PANEL 3: PREVIEW KARTU & DOWNLOAD */}
-            <div className="lg:col-span-6 h-full min-h-0 flex flex-col">
-              <QRPreview
-                config={config}
-                onReset={handleReset}
-                onToast={addToast}
-                onChange={updateConfig}
-              />
+              {leftTab === 'all' && (
+                <div className="space-y-4">
+                  <MeetingForm
+                    config={config}
+                    onChange={updateConfig}
+                    onToast={addToast}
+                    embedded
+                  />
+                  <div className="border-t border-slate-200 pt-3">
+                    <QRSettings
+                      config={config}
+                      onChange={updateConfig}
+                      embedded
+                    />
+                  </div>
+                </div>
+              )}
             </div>
-          </>
-        )}
+          </div>
+        </div>
+
+        {/* LAYER 2: PREVIEW QR BESAR & DOWNLOAD ACTIONS */}
+        <div className="lg:col-span-6 xl:col-span-7 h-full min-h-0 flex flex-col overflow-hidden">
+          <QRPreview
+            config={config}
+            onReset={handleReset}
+            onToast={addToast}
+            onChange={updateConfig}
+          />
+        </div>
       </main>
 
       {/* 3. FOOTER (Compact) */}

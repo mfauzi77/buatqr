@@ -1,14 +1,15 @@
 import React from 'react';
-import { Sparkles, Palette, ShieldAlert, Disc, X, Check } from 'lucide-react';
+import { Sparkles, Palette, ShieldAlert, Disc } from 'lucide-react';
 import { QRConfig, ErrorCorrectionLevel, QRDotStyle } from '../types';
 
 interface QRSettingsProps {
   config: QRConfig;
   onChange: (updates: Partial<QRConfig>) => void;
   onClose?: () => void;
+  embedded?: boolean;
 }
 
-export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClose }) => {
+export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, embedded = false }) => {
   const dotStyles: { id: QRDotStyle; label: string; desc: string; preview: React.ReactNode }[] = [
     {
       id: 'square',
@@ -51,14 +52,66 @@ export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClos
     },
     {
       id: 'classy',
-      label: 'Classy (Kapsul)',
+      label: 'Classy',
       desc: 'Kapsul elegan',
       preview: (
-        <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
+        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">
           <rect x="2" y="2" width="8" height="8" rx="3.5" />
           <rect x="14" y="2" width="8" height="8" rx="3.5" />
           <rect x="2" y="14" width="8" height="8" rx="3.5" />
           <rect x="14" y="14" width="8" height="8" rx="3.5" />
+        </svg>
+      ),
+    },
+    {
+      id: 'diamond',
+      label: 'Ketupat',
+      desc: 'Diamond / Berlian',
+      preview: (
+        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">
+          <polygon points="6,2 11,6 6,10 1,6" />
+          <polygon points="18,2 23,6 18,10 13,6" />
+          <polygon points="6,14 11,18 6,22 1,18" />
+          <polygon points="18,14 23,18 18,22 13,18" />
+        </svg>
+      ),
+    },
+    {
+      id: 'leaf',
+      label: 'Daun',
+      desc: 'Organik melengkung',
+      preview: (
+        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">
+          <path d="M5,2 L10,2 L10,7 Q10,10 7,10 L2,10 L2,5 Q2,2 5,2 Z" />
+          <path d="M17,2 L22,2 L22,7 Q22,10 19,10 L14,10 L14,5 Q14,2 17,2 Z" />
+          <path d="M5,14 L10,14 L10,19 Q10,22 7,22 L2,22 L2,17 Q2,14 5,14 Z" />
+          <path d="M17,14 L22,14 L22,19 Q22,22 19,22 L14,22 L14,17 Q14,14 17,14 Z" />
+        </svg>
+      ),
+    },
+    {
+      id: 'star',
+      label: 'Bintang',
+      desc: 'Sparkle cross / Star',
+      preview: (
+        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">
+          <path d="M6,2 L7.2,4.8 L10,6 L7.2,7.2 L6,10 L4.8,7.2 L2,6 L4.8,4.8 Z" />
+          <path d="M18,2 L19.2,4.8 L22,6 L19.2,7.2 L18,10 L16.8,7.2 L14,6 L16.8,4.8 Z" />
+          <path d="M6,14 L7.2,16.8 L10,18 L7.2,19.2 L6,22 L4.8,19.2 L2,18 L4.8,16.8 Z" />
+          <path d="M18,14 L19.2,16.8 L22,18 L19.2,19.2 L18,22 L16.8,19.2 L14,18 L16.8,16.8 Z" />
+        </svg>
+      ),
+    },
+    {
+      id: 'fluid',
+      label: 'Cair',
+      desc: 'Pebble halus',
+      preview: (
+        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">
+          <rect x="2" y="2" width="8" height="8" rx="3.8" />
+          <rect x="14" y="2" width="8" height="8" rx="3.8" />
+          <rect x="2" y="14" width="8" height="8" rx="3.8" />
+          <rect x="14" y="14" width="8" height="8" rx="3.8" />
         </svg>
       ),
     },
@@ -85,30 +138,29 @@ export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClos
   ];
 
   return (
-    <div id="style-panel-card" className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-3 sm:p-3.5 h-full flex flex-col justify-between overflow-hidden">
-      {/* Header Panel */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-2 shrink-0">
-        <h2 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-          <div className="w-5 h-5 rounded-md bg-blue-600 text-white flex items-center justify-center shadow-2xs">
-            <Sparkles className="w-3 h-3" />
-          </div>
-          Gaya Titik & Desain QR
-        </h2>
-        {onClose && (
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/70 rounded transition-colors cursor-pointer"
-            title="Tutup panel pengaturan gaya titik"
-          >
-            <span>Tutup</span>
-            <X className="w-3 h-3" />
-          </button>
-        )}
-      </div>
+    <div
+      id="style-panel-card"
+      className={`h-full flex flex-col justify-start overflow-hidden ${
+        embedded ? '' : 'bg-white rounded-xl border border-slate-200/90 shadow-2xs p-2.5 sm:p-3'
+      }`}
+    >
+      {/* Header Panel (Shown only when not embedded) */}
+      {!embedded && (
+        <div className="flex items-center justify-between border-b border-slate-100 pb-1.5 mb-2 shrink-0">
+          <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+            <div className="w-5 h-5 rounded-md bg-blue-600 text-white flex items-center justify-center shadow-2xs">
+              <Sparkles className="w-3 h-3" />
+            </div>
+            Gaya Titik & Desain QR
+          </h2>
+          <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+            Kustomisasi
+          </span>
+        </div>
+      )}
 
       {/* Main Content Area */}
-      <div className="space-y-2.5 flex-1 min-h-0 flex flex-col justify-between pt-2">
+      <div className="space-y-2 flex-1 min-h-0 flex flex-col justify-start overflow-y-auto">
         {/* 1. Gaya Titik QR Code (Dot Style) */}
         <div className="space-y-1">
           <div className="flex items-center justify-between">
@@ -116,32 +168,28 @@ export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClos
               <Sparkles className="w-3.5 h-3.5 text-blue-600" />
               Gaya Titik (Dot Style)
             </label>
-            <span className="text-[10px] text-slate-500">Pilih modul</span>
+            <span className="text-[10px] text-slate-500">Bentuk modul</span>
           </div>
-          <div className="grid grid-cols-2 gap-1.5">
+          <div className="grid grid-cols-4 gap-1.5">
             {dotStyles.map((style) => {
               const isSelected = (config.dotStyle || 'square') === style.id;
               return (
                 <button
                   key={style.id}
                   type="button"
+                  id={`btn-dot-style-${style.id}`}
                   onClick={() => onChange({ dotStyle: style.id })}
-                  className={`p-2 rounded-lg border text-left transition-all relative flex items-center gap-2 cursor-pointer ${
+                  className={`h-8 px-1 rounded-lg border text-center transition-all relative flex items-center justify-center gap-1 cursor-pointer ${
                     isSelected
-                      ? 'border-blue-600 bg-blue-50/80 text-blue-900 ring-1 ring-blue-500 shadow-2xs font-semibold'
+                      ? 'border-blue-600 bg-blue-50/90 text-blue-900 ring-1 ring-blue-500 shadow-2xs font-bold'
                       : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
                   }`}
+                  title={`${style.label} - ${style.desc}`}
                 >
                   <div className={`shrink-0 ${isSelected ? 'text-blue-600' : 'text-slate-500'}`}>
                     {style.preview}
                   </div>
-                  <div className="truncate min-w-0">
-                    <div className="text-xs font-bold leading-tight truncate">{style.label}</div>
-                    <div className="text-[9px] text-slate-500 leading-tight truncate">{style.desc}</div>
-                  </div>
-                  {isSelected && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 ml-auto shrink-0" />
-                  )}
+                  <span className="text-[10px] font-semibold leading-tight truncate">{style.label}</span>
                 </button>
               );
             })}
@@ -160,14 +208,14 @@ export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClos
                 key={c.fg}
                 type="button"
                 onClick={() => onChange({ fgColor: c.fg })}
-                className={`flex items-center justify-center gap-1.5 py-1.5 px-2 text-xs rounded-lg border transition-all cursor-pointer ${
+                className={`h-7 px-1.5 flex items-center justify-center gap-1 text-xs rounded-lg border transition-all cursor-pointer ${
                   config.fgColor === c.fg
                     ? 'border-blue-600 bg-blue-50 text-blue-900 font-semibold ring-1 ring-blue-500'
                     : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
                 }`}
               >
                 <span
-                  className="w-3 h-3 rounded-full border border-slate-300 shrink-0"
+                  className="w-2.5 h-2.5 rounded-full border border-slate-300 shrink-0"
                   style={{ backgroundColor: c.fg }}
                 />
                 <span className="text-[11px] truncate">{c.label}</span>
@@ -178,20 +226,20 @@ export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClos
 
         {/* 3. Garis Border & Pelindung Logo di QR */}
         {config.logoPreset !== 'none' && (
-          <div className="p-2 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
+          <div className="p-1.5 bg-slate-50 border border-slate-200 rounded-lg space-y-1">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-slate-800 flex items-center gap-1">
                 <Disc className="w-3.5 h-3.5 text-blue-600" />
-                Garis Border Logo di QR
+                Border Logo di QR
               </label>
-              <label className="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-700">
+              <label className="flex items-center gap-1 cursor-pointer text-xs font-medium text-slate-700">
                 <input
                   type="checkbox"
                   checked={config.logoBorder !== false}
                   onChange={(e) => onChange({ logoBorder: e.target.checked })}
-                  className="w-3.5 h-3.5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                  className="w-3 h-3 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
                 />
-                <span className="text-[11px]">Aktif</span>
+                <span className="text-[10px]">Aktif</span>
               </label>
             </div>
 
@@ -204,17 +252,17 @@ export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClos
                       key={b.color}
                       type="button"
                       onClick={() => onChange({ logoBorderColor: b.color })}
-                      className={`flex items-center justify-center gap-1 py-1 px-1.5 text-xs rounded border transition-all cursor-pointer ${
+                      className={`h-6 px-1 flex items-center justify-center gap-1 text-[10px] rounded border transition-all cursor-pointer ${
                         isSelected
                           ? 'border-blue-600 bg-white text-blue-900 font-semibold ring-1 ring-blue-500 shadow-2xs'
                           : 'border-slate-200 bg-white hover:bg-slate-100/70 text-slate-700'
                       }`}
                     >
                       <span
-                        className="w-2.5 h-2.5 rounded-full border border-slate-300 shrink-0"
+                        className="w-2 h-2 rounded-full border border-slate-300 shrink-0"
                         style={{ backgroundColor: b.color }}
                       />
-                      <span className="text-[10px] truncate">{b.label}</span>
+                      <span className="truncate">{b.label}</span>
                     </button>
                   );
                 })}
@@ -223,7 +271,7 @@ export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClos
           </div>
         )}
 
-        {/* 4. Ketahanan Pindai (Error Correction) & Margin */}
+        {/* 4. Ketahanan Pindai (Error Correction) */}
         <div className="space-y-1">
           <label className="text-xs font-semibold text-slate-800 flex items-center gap-1">
             <ShieldAlert className="w-3.5 h-3.5 text-blue-600" />
@@ -237,27 +285,28 @@ export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClos
                   key={opt.level}
                   type="button"
                   onClick={() => onChange({ errorCorrectionLevel: opt.level })}
-                  className={`p-1.5 rounded-lg border text-left text-xs transition-all relative cursor-pointer ${
+                  className={`h-7 px-1.5 rounded-lg border text-center text-xs transition-all flex items-center justify-center gap-1 cursor-pointer ${
                     isSelected
-                      ? 'border-blue-600 bg-blue-50 text-blue-900 font-semibold ring-1 ring-blue-500'
-                      : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
+                      ? 'border-blue-600 bg-blue-50 text-blue-900 font-bold ring-1 ring-blue-500'
+                      : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium'
                   }`}
                 >
-                  <div className="font-semibold text-xs leading-tight">{opt.level}</div>
-                  <div className="text-[9px] text-slate-500 leading-tight truncate">{opt.desc}</div>
+                  <span>{opt.level}</span>
+                  <span className="text-[10px] opacity-75">
+                    ({opt.level === 'H' ? '30%' : opt.level === 'Q' ? '25%' : '15%'})
+                  </span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* 5. Margin & Ukuran Logo Sliders */}
-        <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
-          <div className="space-y-0.5">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="font-medium text-slate-700">Margin Putih</span>
-              <span className="font-mono font-bold text-blue-700">{config.margin} px</span>
-            </div>
+        {/* 5. Margin & Ukuran Logo Sliders (Inline controls with labels) */}
+        <div className="space-y-1.5 pt-1.5 border-t border-slate-100">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-medium text-slate-700 shrink-0">
+              Margin: <strong className="font-mono text-blue-700">{config.margin}px</strong>
+            </span>
             <input
               type="range"
               min="1"
@@ -265,16 +314,15 @@ export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClos
               step="1"
               value={config.margin}
               onChange={(e) => onChange({ margin: Number(e.target.value) })}
-              className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-28 sm:w-36 h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
           </div>
 
           {config.logoPreset !== 'none' && (
-            <div className="space-y-0.5">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="font-medium text-slate-700">Ukuran Logo</span>
-                <span className="font-mono font-bold text-blue-700">{config.logoSizePercent}%</span>
-              </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-medium text-slate-700 shrink-0">
+                Ukuran Logo: <strong className="font-mono text-blue-700">{config.logoSizePercent}%</strong>
+              </span>
               <input
                 type="range"
                 min="14"
@@ -282,7 +330,7 @@ export const QRSettings: React.FC<QRSettingsProps> = ({ config, onChange, onClos
                 step="1"
                 value={config.logoSizePercent}
                 onChange={(e) => onChange({ logoSizePercent: Number(e.target.value) })}
-                className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                className="w-28 sm:w-36 h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
               />
             </div>
           )}

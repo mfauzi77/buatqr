@@ -79,7 +79,7 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ config, onChange, on
               type="button"
               id={`logo-preset-${preset.id}`}
               onClick={() => selectPreset(preset.id)}
-              className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg border text-center transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-1.5 h-8 px-2 rounded-lg border text-center transition-all cursor-pointer ${
                 isSelected
                   ? 'border-blue-600 bg-blue-50/80 ring-1 ring-blue-500 text-blue-900 shadow-2xs font-bold'
                   : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'

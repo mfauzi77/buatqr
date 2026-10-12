@@ -4,7 +4,7 @@ export type LogoPresetType = 'default' | 'none' | 'custom' | string;
 
 export type DownloadFormat = 'png' | 'svg';
 
-export type QRDotStyle = 'square' | 'rounded' | 'dots' | 'classy';
+export type QRDotStyle = 'square' | 'rounded' | 'dots' | 'classy' | 'diamond' | 'leaf' | 'star' | 'fluid';
 
 export interface QRConfig {
   meetingUrl: string;
