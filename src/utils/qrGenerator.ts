@@ -459,34 +459,33 @@ export async function generateRawQRCanvas(
       const drawX = centerX - drawW / 2;
       const drawY = centerY - drawH / 2;
 
-      const hasBorder = config.logoBorder !== false; // Default true
-      if (hasBorder) {
-        // Radius of protective circular badge
-        const badgeRadius = (Math.max(drawW, drawH) / 2) + Math.max(resolution * 0.012, 5);
-        
-        ctx.save();
-        // 1. Draw solid circular badge background in white (or config.bgColor) so QR dark modules are kept away cleanly
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, badgeRadius, 0, Math.PI * 2);
-        ctx.fillStyle = config.bgColor || '#ffffff';
-        ctx.fill();
+      // Always draw a clean circular background backing in white/bgColor so QR modules don't clash under the logo
+      const badgeRadius = (Math.max(drawW, drawH) / 2) + Math.max(resolution * 0.008, 4);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, badgeRadius, 0, Math.PI * 2);
+      ctx.fillStyle = config.bgColor || '#ffffff';
+      ctx.fill();
 
-        // 2. Draw crisp circular border stroke
+      // Draw border stroke only if logoBorder is explicitly enabled
+      const hasBorder = Boolean(config.logoBorder);
+      if (hasBorder) {
+        // Draw crisp circular border stroke
         const strokeColor = config.logoBorderColor || config.fgColor || '#0F172A';
         const strokeWidth = Math.max(resolution * 0.0035, 2.5);
         ctx.lineWidth = strokeWidth;
         ctx.strokeStyle = strokeColor;
         ctx.stroke();
 
-        // 3. Subtle inner accent ring for high-end crest framing
+        // Subtle inner accent ring for high-end crest framing
         ctx.beginPath();
         ctx.arc(centerX, centerY, Math.max(badgeRadius - strokeWidth - 2, 2), 0, Math.PI * 2);
         ctx.lineWidth = Math.max(resolution * 0.001, 1);
         ctx.strokeStyle = strokeColor;
         ctx.globalAlpha = 0.25;
         ctx.stroke();
-        ctx.restore();
       }
+      ctx.restore();
 
       // Draw logo centered and sharp inside the framed badge
       ctx.drawImage(logoImg, drawX, drawY, drawW, drawH);
@@ -728,18 +727,23 @@ export async function generateQRSVG(
     const logoX = centerX - logoSize / 2;
     const logoY = centerY - logoSize / 2;
 
-    const hasBorder = config.logoBorder !== false;
-    let badgeSvg = '';
+    const hasBorder = Boolean(config.logoBorder);
+    const badgeRadius = (logoSize / 2) + Math.max(viewBoxSize * 0.008, 4);
+    let borderStrokeSvg = '';
     if (hasBorder) {
-      const badgeRadius = (logoSize / 2) + Math.max(viewBoxSize * 0.012, 5);
       const strokeColor = config.logoBorderColor || config.fgColor || '#0F172A';
       const strokeWidth = Math.max(viewBoxSize * 0.0035, 2.5);
-      badgeSvg = `
-        <!-- Circular protective badge and border ring -->
-        <circle cx="${centerX.toFixed(2)}" cy="${centerY.toFixed(2)}" r="${badgeRadius.toFixed(2)}" fill="${config.bgColor || '#FFFFFF'}" stroke="${strokeColor}" stroke-width="${strokeWidth.toFixed(2)}" />
+      borderStrokeSvg = `
+        <circle cx="${centerX.toFixed(2)}" cy="${centerY.toFixed(2)}" r="${badgeRadius.toFixed(2)}" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth.toFixed(2)}" />
         <circle cx="${centerX.toFixed(2)}" cy="${centerY.toFixed(2)}" r="${(badgeRadius - strokeWidth - 2).toFixed(2)}" fill="none" stroke="${strokeColor}" stroke-width="1" opacity="0.25" />
       `;
     }
+
+    const badgeSvg = `
+      <!-- Circular protective white backing without border unless enabled -->
+      <circle cx="${centerX.toFixed(2)}" cy="${centerY.toFixed(2)}" r="${badgeRadius.toFixed(2)}" fill="${config.bgColor || '#FFFFFF'}" />
+      ${borderStrokeSvg}
+    `;
 
     logoSvgElement = `
       <g id="qr-logo-overlay">

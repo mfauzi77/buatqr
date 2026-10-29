@@ -34,7 +34,7 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ config, onChange, on
           customLogoUrl: result,
           customLogoName: file.name,
         });
-        onToast(`Logo "${file.name}" berhasil diunggah (tanpa background)`, 'success');
+        onToast(`Logo "${file.name}" aktif (tersimpan sementara, hilang saat reload)`, 'success');
       }
     };
     reader.readAsDataURL(file);
@@ -48,10 +48,10 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ config, onChange, on
   };
 
   const selectPreset = (presetId: LogoPresetType) => {
-    if (presetId === 'custom' && !config.customLogoUrl) {
+    onChange({ logoPreset: presetId });
+    if (presetId === 'custom') {
+      // Trigger file dialog
       fileInputRef.current?.click();
-    } else {
-      onChange({ logoPreset: presetId });
     }
   };
 
@@ -59,13 +59,29 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ config, onChange, on
 
   return (
     <div id="logo-uploader-section" className="space-y-1.5 pt-1">
+      {/* Hidden File Input - Always mounted in DOM so it can be triggered from any button */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        id="logo-file-input"
+        accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
+        className="hidden"
+        onChange={(e) => {
+          if (e.target.files?.[0]) {
+            handleFileUpload(e.target.files[0]);
+          }
+          // Reset value so re-selecting the exact same file also triggers onChange
+          e.target.value = '';
+        }}
+      />
+
       <div className="flex items-center justify-between">
         <label className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
           <ImageIcon className="w-3.5 h-3.5 text-blue-600" />
           Pilihan Logo QR
         </label>
         <span className="text-[10px] text-slate-500 font-medium">
-          Garis border aktif & rapi
+          {currentPreset === 'custom' ? 'Sementara (hilang saat reload)' : 'Logo Resmi'}
         </span>
       </div>
 
@@ -117,15 +133,6 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ config, onChange, on
           onClick={() => fileInputRef.current?.click()}
           className="border border-dashed border-blue-300 hover:border-blue-500 rounded-lg p-2 bg-blue-50/30 hover:bg-blue-50/60 transition-all cursor-pointer text-center"
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
-            className="hidden"
-            onChange={(e) => {
-              if (e.target.files?.[0]) handleFileUpload(e.target.files[0]);
-            }}
-          />
 
           {config.customLogoUrl ? (
             <div className="flex items-center justify-between gap-2 text-left">

@@ -19,7 +19,7 @@ const INITIAL_CONFIG: QRConfig = {
   qrSize: 1024,
   margin: 2,
   logoSizePercent: 20,
-  logoBorder: true,
+  logoBorder: false,
   logoBorderColor: '#0F172A',
   dotStyle: 'square',
   fgColor: '#000000',
@@ -34,7 +34,12 @@ export default function App() {
       const saved = localStorage.getItem('app_qr_generator_config');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.logoPreset && parsed.logoPreset !== 'none' && parsed.logoPreset !== 'custom') {
+        // Custom uploaded logo is strictly temporary; on reload it resets to default Logo PMK
+        delete parsed.customLogoUrl;
+        delete parsed.customLogoName;
+        // Default logoBorder to false
+        parsed.logoBorder = false;
+        if (parsed.logoPreset === 'custom' || !parsed.logoPreset || (parsed.logoPreset !== 'none' && parsed.logoPreset !== 'default')) {
           parsed.logoPreset = 'default';
         }
         if (parsed.meetingUrl === 'https://meet.google.com/abc-defg-hij') {
@@ -44,7 +49,13 @@ export default function App() {
         if (parsed.meetingName === 'Rapat Koordinasi Nasional') {
           parsed.meetingName = 'Judul';
         }
-        return { ...INITIAL_CONFIG, ...parsed };
+        return {
+          ...INITIAL_CONFIG,
+          ...parsed,
+          logoBorder: false,
+          customLogoUrl: null,
+          customLogoName: undefined,
+        };
       }
     } catch {
       // ignore
@@ -55,10 +66,17 @@ export default function App() {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [leftTab, setLeftTab] = useState<'content' | 'style' | 'all'>('content');
 
-  // Persist settings locally
+  // Persist settings locally (Omit temporary custom logo so it is never saved to localStorage)
   useEffect(() => {
     try {
-      localStorage.setItem('app_qr_generator_config', JSON.stringify(config));
+      const toSave = { ...config };
+      // Uploaded logo is temporary in memory only; reset preset to default in storage
+      delete toSave.customLogoUrl;
+      delete toSave.customLogoName;
+      if (toSave.logoPreset === 'custom') {
+        toSave.logoPreset = 'default';
+      }
+      localStorage.setItem('app_qr_generator_config', JSON.stringify(toSave));
     } catch {
       // ignore
     }
